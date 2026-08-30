@@ -1,0 +1,10 @@
+node_modules
+.expo
+dist
+.env
+.env.local
+web-build
+*.log
+
+.env
+.env.example

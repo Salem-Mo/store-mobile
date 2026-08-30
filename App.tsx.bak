@@ -1,0 +1,44 @@
+import React from 'react';
+import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { I18nManager, Platform, Text, View } from 'react-native';
+import RootNav from '@/navigation/Root';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
+if (Platform.OS !== 'web') {
+  try {
+    if (!I18nManager.isRTL) {
+      I18nManager.allowRTL(true);
+    }
+  } catch {}
+}
+
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { error: Error | null }> {
+  state = { error: null as Error | null };
+  static getDerivedStateFromError(error: Error) { return { error }; }
+  componentDidCatch(error: Error, info: unknown) { console.error('[App]', error, info); }
+  render() {
+    if (this.state.error) {
+      return (
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, backgroundColor: '#f3f6fa' }}>
+          <Text style={{ fontWeight: '900', color: '#14213d' }}>حدث خطأ</Text>
+          <Text style={{ color: '#718096', fontSize: 12, marginTop: 8 }}>{String(this.state.error.message)}</Text>
+        </View>
+      );
+    }
+    return this.props.children as React.ReactElement;
+  }
+}
+
+export default function App() {
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <ErrorBoundary>
+          <StatusBar style="dark" backgroundColor="#14213d" />
+          <RootNav />
+        </ErrorBoundary>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
+  );
+}

@@ -1,0 +1,61 @@
+{
+  "expo": {
+    "name": "سوبر ماركت أيوب",
+    "slug": "ayoub-market-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "ayoub-market",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#14213d",
+      "resizeMode": "contain",
+      "image": "./assets/splash.png"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ayoub.market",
+      "infoPlist": {
+        "NSCameraUsageDescription": "نحتاج الكاميرا لمسح الباركود في نقطة البيع"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#14213d"
+      },
+      "package": "com.ayoub.market",
+      "permissions": [
+        "CAMERA",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "edgeToEdgeEnabled": true,
+      "usesCleartextTraffic": true
+    },
+    "web": {
+      "bundler": "metro",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "السماح للكاميرا لمسح باركود المنتجات"
+        }
+      ],
+      "expo-secure-store"
+    ],
+    "extra": {
+      "EXPO_PUBLIC_SUPABASE_URL": "https://jomgksetqqxyuarwhprq.supabase.co",
+      "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_hje37SMrZE0QrrECLyEq9A_Qvfpc6tV",
+      "EXPO_PUBLIC_WEB_URL": "http://192.168.1.8:3000",
+      "eas": {
+        "projectId": "b9cc527b-7f68-4fe7-bc8c-5e17ac875f59"
+      }
+    }
+  }
+}
