@@ -18,6 +18,7 @@ import { useAuth } from '@/lib/store';
 import {
   setAuthToken,
   getWebBaseUrl,
+  isLocalServerUrl,
   fetchOwnerWhatsapp,
   updateOwnerWhatsapp,
   fetchWorkers,
@@ -322,14 +323,12 @@ export default function SettingsScreen() {
 
   function openWeb() {
     const base = getWebBaseUrl();
-    if (!base || base.includes('localhost') || base.includes('192.168.1.8') || base.includes('10.0.2.2')) {
-      if (base.includes('localhost') || base.includes('192.168')) {
-        Alert.alert('تنبيه', `EXPO_PUBLIC_WEB_URL الحالي ${base} يعمل فقط على نفس الواي فاي. للتوزيع استخدم رابط Vercel في mobile/.env و mobile/app.json extra.`);
-      }
-    }
-    if (!base || base === 'http://localhost:3000') {
-      Alert.alert('تنبيه', 'أدخل EXPO_PUBLIC_WEB_URL الصحيح في app.json → expo.extra.EXPO_PUBLIC_WEB_URL أو في mobile/.env');
+    if (!base) {
+      Alert.alert('تنبيه', 'أدخل EXPO_PUBLIC_WEB_URL الصحيح في .env (المصدر الوحيد للرابط)');
       return;
+    }
+    if (isLocalServerUrl(base)) {
+      Alert.alert('تنبيه', `EXPO_PUBLIC_WEB_URL الحالي ${base} يعمل فقط على نفس الواي فاي. للتوزيع استخدم رابط Vercel في .env.`);
     }
     Linking.openURL(base).catch(() => Alert.alert('تعذر فتح الرابط', base));
   }

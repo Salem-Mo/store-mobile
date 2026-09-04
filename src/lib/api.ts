@@ -3,41 +3,12 @@
  * Keeps the web's security model: PIN-hashed workers, rate-limited,
  * atomic checkout RPC. Mobile reuses the same endpoints.
  *
- * Configure WEB_URL in .env (e.g. https://your-vercel.app)
+ * Server URL comes from ONE place only: `.env` → `EXPO_PUBLIC_WEB_URL`
+ * (see `src/lib/serverConfig.ts`). No IPs are hardcoded here.
  */
-import Constants from 'expo-constants';
-import { Platform } from 'react-native';
+import { getWebBaseUrl, getWebBaseFallbacks } from './serverConfig';
 
-function getWebBase(): string {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const extra = ((Constants.expoConfig as any)?.extra || (Constants.manifest as any)?.extra || {}) as Record<string, string>;
-  const fromExtra = extra.EXPO_PUBLIC_WEB_URL || extra.WEB_URL || extra.EXPO_PUBLIC_SUPABASE_URL && '';
-  const fromProcess =
-    (typeof process !== 'undefined' && (process.env as Record<string, string>).EXPO_PUBLIC_WEB_URL) || ''
-  const raw = (fromExtra || fromProcess || 'http://localhost:3000').trim();
-  if (Platform.OS === 'android' && raw.includes('localhost')) {
-    return raw.replace('localhost', '10.0.2.2');
-  }
-  return raw.replace(/\/$/, '');
-}
-
-// Fallback candidates when primary host times out (covers firewall/emulator + adb reverse)
-function getWebBaseFallbacks(primary: string): string[] {
-  const fallbacks: string[] = [];
-  if (primary.includes('192.168.1.8')) {
-    fallbacks.push(primary.replace('192.168.1.8', '10.0.2.2'));
-    fallbacks.push(primary.replace('192.168.1.8', '127.0.0.1'));
-  }
-  if (primary.includes('10.0.2.2')) {
-    fallbacks.push(primary.replace('10.0.2.2', '192.168.1.8'));
-    fallbacks.push(primary.replace('10.0.2.2', '127.0.0.1'));
-  }
-  if (primary.includes('localhost') || primary.includes('127.0.0.1')) {
-    fallbacks.push(primary.replace(/localhost|127\.0\.0\.1/g, '10.0.2.2'));
-    fallbacks.push(primary.replace(/localhost|127\.0\.0\.1/g, '192.168.1.8'));
-  }
-  return [...new Set(fallbacks.filter((b) => b !== primary))];
-}
+export { getWebBaseUrl, isLocalServerUrl } from './serverConfig';
 
 export type ApiUser = {
   id?: string;
@@ -55,9 +26,6 @@ export function setAuthToken(t: string | null) {
 export function getAuthToken() {
   return authToken;
 }
-export function getWebBaseUrl() {
-  return getWebBase();
-}
 
 function headers(extra?: Record<string, string>): Record<string, string> {
   const h: Record<string, string> = { 'Content-Type': 'application/json', ...(extra || {}) };
@@ -66,7 +34,8 @@ function headers(extra?: Record<string, string>): Record<string, string> {
 }
 
 async function jsonFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const bases = [getWebBase(), ...getWebBaseFallbacks(getWebBase())];
+  const primaryBase = getWebBaseUrl();
+  const bases = [primaryBase, ...getWebBaseFallbacks(primaryBase)];
   let lastErr: unknown = null;
   for (const base of bases) {
     const url = `${base}${path}`;
@@ -103,7 +72,7 @@ async function jsonFetch<T>(path: string, init?: RequestInit): Promise<T> {
         }
       }
       // Final base failed — throw user-friendly message
-      const primary = getWebBase();
+      const primary = getWebBaseUrl();
       const tried = bases.join(', ');
       const isAbortFinal = isAbort;
       throw new Error(

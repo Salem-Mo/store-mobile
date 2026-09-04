@@ -50,9 +50,7 @@
       "expo-secure-store"
     ],
     "extra": {
-      "EXPO_PUBLIC_SUPABASE_URL": "https://jomgksetqqxyuarwhprq.supabase.co",
-      "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_hje37SMrZE0QrrECLyEq9A_Qvfpc6tV",
-      "EXPO_PUBLIC_WEB_URL": "http://192.168.1.8:3000",
+      "//": "Values are injected from .env by app.config.js — do NOT hardcode IPs/URLs here. Change .env → EXPO_PUBLIC_WEB_URL only.",
       "eas": {
         "projectId": "b9cc527b-7f68-4fe7-bc8c-5e17ac875f59"
       }

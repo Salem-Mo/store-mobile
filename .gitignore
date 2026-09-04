@@ -5,6 +5,4 @@ dist
 .env.local
 web-build
 *.log
-
-.env
 .env.example
